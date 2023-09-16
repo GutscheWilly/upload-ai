@@ -13,3 +13,13 @@ Content-Type: audio/mpeg
 
 < ./example.mp3
 ------Boundary--
+
+###
+
+# @name create-video-transcription
+POST http://localhost:3333/videos/ead59d5a-028d-4190-b075-32a0e323c3a0/transcription
+Content-Type: application/json
+
+{
+    "prompt": "aula, português"
+}
