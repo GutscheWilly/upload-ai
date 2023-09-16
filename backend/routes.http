@@ -23,3 +23,15 @@ Content-Type: application/json
 {
     "prompt": "aula, português"
 }
+
+###
+
+# @name generate-ai-completion
+POST http://localhost:3333/ai/generate-completion
+Content-Type: application/json
+
+{
+    "videoId": "ead59d5a-028d-4190-b075-32a0e323c3a0",
+    "template": "Gere um resumo da transcrição do vídeo a seguir: ''' {transcription} '''",
+    "temperature": 0
+}
