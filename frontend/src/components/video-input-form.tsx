@@ -18,10 +18,13 @@ const statusMessage = {
   success: 'Sucesso!'
 };
 
-export function VideoInputForm() {
+interface VideoInputFormProps {
+  onVideoSelected: (videoId: string | null) => void
+}
+
+export function VideoInputForm(props: VideoInputFormProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [status, setStatus] = useState<Status>('waiting');
-
   const promptInputRef= useRef<HTMLTextAreaElement>(null);
 
   function handleSelectVideo(event: ChangeEvent<HTMLInputElement>) {
@@ -89,6 +92,7 @@ export function VideoInputForm() {
     await api.post(`/videos/${videoId}/transcription`, { prompt });
 
     setStatus('success');
+    props.onVideoSelected(videoId);
   }
 
   const previewURL = useMemo( () => {

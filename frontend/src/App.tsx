@@ -3,12 +3,34 @@ import { Github, Wand2 } from "lucide-react";
 import { Separator } from "./components/ui/separator";
 import { Textarea } from "./components/ui/textarea";
 import { Label } from "./components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Slider } from "./components/ui/slider";
 import { VideoInputForm } from "./components/video-input-form";
 import { PromptSelect } from "./components/prompt-select";
+import { useState } from "react";
+import { useCompletion } from "ai/react";
 
 export function App() {
+  const [videoId, setVideoId] = useState<string | null>(null);
+  const [temperature, setTemperature] = useState<number>(0.5);
+
+  const {
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    completion,
+    isLoading
+  } = useCompletion({
+    api: 'http://localhost:3333/ai/generate-completion',
+    body: {
+      videoId,
+      temperature
+    },
+    headers: {
+      'Content-type': 'application/json'
+    }
+  });
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="px-6 py-3 flex items-center justify-between border-b">
@@ -34,12 +56,15 @@ export function App() {
             <Textarea
               className="resize-none p-5 leading-relaxed"
               placeholder="Inclua o prompt para a IA..." 
+              value={input}
+              onChange={handleInputChange}
             />
 
             <Textarea
               className="resize-none p-5 leading-relaxed" 
               placeholder="Resultado gerado..." 
               readOnly 
+              value={completion}
             />
           </div>
 
@@ -49,32 +74,14 @@ export function App() {
         </div>
 
         <aside className="w-80 space-y-6">
-          <VideoInputForm />
+          <VideoInputForm onVideoSelected={setVideoId} />
 
           <Separator />
 
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label>Prompt</Label>
-              <PromptSelect />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Modelo</Label>
-
-              <Select defaultValue="gpt3.5" disabled>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="gpt3.5">GPT 3.5-turbo 16k</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <span className="block text-xs text-muted-foreground italic leading-relaxed">
-                Você poderá customizar essa opção em breve.
-              </span>
+              <PromptSelect onPromptSelected={setInput} />
             </div>
 
             <Separator />
@@ -86,7 +93,8 @@ export function App() {
                 min={0}
                 max={1}
                 step={0.1}
-                defaultValue={[0.5]} 
+                value={[temperature]}
+                onValueChange={ value => setTemperature(value[0]) }
               />
 
               <span className="block text-xs text-muted-foreground italic leading-relaxed">
@@ -96,7 +104,7 @@ export function App() {
 
             <Separator />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isLoading}>
               Executar
               <Wand2 className="w-4 h-4 ml-2" />
             </Button>
